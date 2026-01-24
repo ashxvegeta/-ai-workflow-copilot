@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers.emails import router as emails_router
+from app.routes.emails import router as emails_router
 app = FastAPI(title="AI Workflow Co-Pilot")
 app.include_router(emails_router, prefix="/emails")
 @app.get("/")
