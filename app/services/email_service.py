@@ -1,5 +1,7 @@
+from app.services.ai_service import summarize_email
+
 def get_sample_emails():
-    return [
+    emails = [
         {
             "from": "manager@company.com",
             "subject": "Project deadline",
@@ -11,3 +13,7 @@ def get_sample_emails():
             "body": "Please review the updated work from home policy."
         }
     ]
+    
+    for email in emails:
+        email["summary"] = summarize_email(email["body"])
+    return emails
