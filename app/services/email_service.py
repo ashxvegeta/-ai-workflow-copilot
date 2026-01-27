@@ -1,4 +1,9 @@
-from app.services.ai_service import summarize_email,extract_tasks
+from app.services.ai_service import (
+    summarize_email,
+    extract_tasks,
+    detect_urgency
+)
+
 
 def get_sample_emails():
     emails = [
@@ -17,4 +22,5 @@ def get_sample_emails():
     for email in emails:
         email["summary"] = summarize_email(email["body"])
         email["tasks"] = extract_tasks(email["body"])
+        email["urgency"] = detect_urgency(email["body"])
     return emails

@@ -61,3 +61,25 @@ def extract_tasks(text: str) -> list[str]:
     ]
 
     return tasks
+
+def detect_urgency(text):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Classify the urgency of this email as one of: "
+                    "high, medium, or low.\n\n"
+                    "Rules:\n"
+                    "- Deadlines or time pressure → high\n"
+                    "- Requests without strict deadlines → medium\n"
+                    "- Informational or FYI emails → low\n\n"
+                    "Return ONLY the urgency word."
+                )
+            },
+            {"role": "user", "content": text}
+        ]
+    )
+
+    return response.choices[0].message.content.strip().lower()
