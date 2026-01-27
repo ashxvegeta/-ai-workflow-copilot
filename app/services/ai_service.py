@@ -25,3 +25,39 @@ def summarize_email(text: str) -> str:
     )
 
     return response.choices[0].message.content.strip()
+
+
+def extract_tasks(text: str) -> list[str]:
+    """
+    Extract actionable tasks from an email body.
+    """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You extract clear, actionable tasks from emails. "
+                    "Return each task as a bullet point. "
+                    "If no tasks exist, return an empty list."
+                )
+            },
+            {
+                "role": "user",
+                "content": text
+            }
+        ],
+        temperature=0.2
+    )
+
+    raw_tasks = response.choices[0].message.content.strip()
+
+    # Convert bullet output into Python list
+    tasks = [
+        line.strip("- ").strip()
+        for line in raw_tasks.split("\n")
+        if line.strip()
+    ]
+
+    return tasks

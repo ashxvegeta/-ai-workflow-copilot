@@ -1,4 +1,4 @@
-from app.services.ai_service import summarize_email
+from app.services.ai_service import summarize_email,extract_tasks
 
 def get_sample_emails():
     emails = [
@@ -10,10 +10,11 @@ def get_sample_emails():
         {
             "from": "hr@company.com",
             "subject": "Policy Update",
-            "body": "Please review the updated work from home policy."
+            "body": "Hi team,Hope you're doing well.As discussed in yesterday’s meeting, please complete the dashboard by Friday.Let me know if you face blockers.Thanks,Manager"
         }
     ]
     
     for email in emails:
         email["summary"] = summarize_email(email["body"])
+        email["tasks"] = extract_tasks(email["body"])
     return emails
