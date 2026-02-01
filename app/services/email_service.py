@@ -49,3 +49,5 @@ def process_and_store_emails(db: Session):
         db.commit()
         saved_emails.append(email_obj)
         return saved_emails
+     
+
