@@ -8,7 +8,7 @@ from app.services.ai_service import (summarize_email,extract_tasks,detect_urgenc
 
 
 def process_and_store_emails(db: Session):
-     emails = [
+    emails = [
         {
             "from": "manager@company.com",
             "subject": "Project deadline",
@@ -20,11 +20,10 @@ def process_and_store_emails(db: Session):
             "body": "Hi team,Hope you're doing well.As discussed in yesterday’s meeting, please complete the dashboard by Friday.Let me know if you face blockers.Thanks,Manager"
         }
     ]
-     
-     
 
-     saved_emails = []
-     for email in emails:
+    saved_emails = []
+
+    for email in emails:
         summary = summarize_email(email["body"])
         tasks = extract_tasks(email["body"])
         urgency = detect_urgency(email["body"])
@@ -36,6 +35,7 @@ def process_and_store_emails(db: Session):
             summary=summary,
             urgency=urgency
         )
+
         db.add(email_obj)
         db.commit()
         db.refresh(email_obj)
@@ -46,8 +46,12 @@ def process_and_store_emails(db: Session):
                 task_text=task_text
             )
             db.add(task_obj)
+
         db.commit()
         saved_emails.append(email_obj)
-        return saved_emails
-     
 
+    # ✅ return AFTER loop finishes
+    return saved_emails
+     
+def get_stored_emails(db: Session):
+    return db.query(Email).all()
