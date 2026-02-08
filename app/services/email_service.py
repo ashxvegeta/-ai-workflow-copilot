@@ -52,6 +52,7 @@ def process_and_store_emails(db: Session):
 
     # ✅ return AFTER loop finishes
     return saved_emails
+    # return saved_emails # ❌ incorrect placement before now fix
      
 def get_stored_emails(db: Session):
     return db.query(Email).all()
