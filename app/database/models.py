@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String,Text, ForeignKey
+from sqlalchemy import Column, Integer, String,Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from .db import Base
 
 class Email(Base):
@@ -24,6 +25,18 @@ class Task(Base):
     is_completed = Column(Integer, default=0)
     # Each task belongs to one email
     email = relationship("Email", back_populates="tasks")
+
+
+class EmailAction(Base):
+    __tablename__ = "email_actions"
+
+    id = Column(Integer, primary_key=True)
+    email_id = Column(Integer, ForeignKey("emails.id"), nullable=False)
+    action_type = Column(String(20), nullable=False)  
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+
 
      
     
