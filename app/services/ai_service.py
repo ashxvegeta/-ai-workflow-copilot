@@ -28,19 +28,15 @@ def summarize_email(text: str) -> str:
 
 
 def extract_tasks(text: str) -> list[str]:
-    """
-    Extract actionable tasks from an email body.
-    """
-
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
                 "content": (
-                    "You extract clear, actionable tasks from emails. "
-                    "Return each task as a bullet point. "
-                    "If no tasks exist, return an empty list."
+                    "Extract actionable tasks from the email.\n"
+                    "Return ONLY bullet points starting with '-'.\n"
+                    "If no tasks exist, return NOTHING."
                 )
             },
             {
@@ -53,14 +49,18 @@ def extract_tasks(text: str) -> list[str]:
 
     raw_tasks = response.choices[0].message.content.strip()
 
-    # Convert bullet output into Python list
+    # 🚨 Guard clause
+    if raw_tasks in ("", "[]"):
+        return []
+
     tasks = [
         line.strip("- ").strip()
         for line in raw_tasks.split("\n")
-        if line.strip()
+        if line.strip().startswith("-")
     ]
 
     return tasks
+
 
 def detect_urgency(text):
     response = client.chat.completions.create(
