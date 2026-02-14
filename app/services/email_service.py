@@ -6,6 +6,9 @@ from app.database.models import Email, Task
 from app.routes import emails
 from app.schemas.email_schema import EmailCreate
 from app.services.ai_service import (summarize_email,extract_tasks,detect_urgency)
+from app.services.action_service import decide_action
+from app.database.models import EmailAction
+from app.services.action_service import decide_action
 
 
 def process_and_store_emails(db: Session, email: EmailCreate):
@@ -14,6 +17,8 @@ def process_and_store_emails(db: Session, email: EmailCreate):
         summary = summarize_email(email.body)
         tasks = extract_tasks(email.body)
         urgency = detect_urgency(email.body)
+        action_type = decide_action(urgency, tasks)
+        print("DECIDED ACTION:", action_type)
   
 
         # 2️⃣ Save Email
@@ -24,12 +29,22 @@ def process_and_store_emails(db: Session, email: EmailCreate):
             summary=summary,
             urgency=urgency
         )
-        
+
         db.add(email_obj)
         db.commit()
         db.refresh(email_obj)
+        print("EMAIL STORED WITH ID:", email_obj.id)
 
-        # 3️⃣ Save Tasks
+        # 3️⃣ Save Action (ONLY if needed)
+        if action_type != "none":
+            action_obj = EmailAction(
+            email_id=email_obj.id,
+            action_type=action_type
+        )
+        db.add(action_obj)
+          
+
+        # 4️⃣ Save Tasks
         for task_text in tasks:
             task_obj = Task(
                 email_id=email_obj.id,
