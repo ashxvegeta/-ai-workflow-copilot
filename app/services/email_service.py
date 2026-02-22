@@ -56,4 +56,9 @@ def process_and_store_emails(db: Session, email: EmailCreate):
         return email_obj
      
 def get_stored_emails(db: Session):
-    return db.query(Email).all()
+    emails = db.query(Email).all()
+    for email in emails:
+        # Fetch the latest action from the related table
+        action_record = db.query(EmailAction).filter(EmailAction.email_id == email.id).first()
+        email.action = action_record.action_type if action_record else "none"
+    return emails

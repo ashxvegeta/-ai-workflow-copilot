@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from app.schemas.task import TaskResponse
 
 class EmailResponse(BaseModel):
@@ -9,6 +9,7 @@ class EmailResponse(BaseModel):
     body: str
     summary: str
     urgency: str
+    action: Optional[str] = "none"
     tasks: List[TaskResponse]
 
     class Config:
