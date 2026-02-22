@@ -9,6 +9,7 @@ from app.services.ai_service import (summarize_email,extract_tasks,detect_urgenc
 from app.services.action_service import decide_action
 from app.database.models import EmailAction
 from app.services.action_service import decide_action
+from app.services.workflow_service import execute_action
 
 
 def process_and_store_emails(db: Session, email: EmailCreate):
@@ -53,6 +54,7 @@ def process_and_store_emails(db: Session, email: EmailCreate):
             db.add(task_obj)
 
         db.commit()
+        execute_action(action_type, email_obj)
         return email_obj
      
 def get_stored_emails(db: Session):
