@@ -5,6 +5,8 @@ def execute_action(action_type: str, email):
 
     if action_type == "escalate":
 
+        print(f"[ESCALATION] Email {email.id} escalated!")
+
         subject = f"🚨 Escalation Alert - Email {email.id}"
 
         body = f"""
@@ -18,7 +20,7 @@ Summary: {email.summary}
         send_email_notification(subject, body)
 
     elif action_type == "reminder":
-        print(f"[REMINDER] Email {email.id}")
+        print(f"[REMINDER] Reminder created for Email {email.id}")
 
     else:
         print(f"[NO ACTION] Email {email.id}")

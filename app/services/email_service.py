@@ -14,45 +14,49 @@ from app.services.workflow_service import execute_action
 
 def process_and_store_emails(db: Session, email: EmailCreate):
 
-    # 1️⃣ AI processing
-    summary = summarize_email(email.body)
-    tasks = extract_tasks(email.body)
-    urgency = detect_urgency(email.body)
-    action_type = decide_action(urgency, tasks)
+        # 1️⃣ AI processing
+        summary = summarize_email(email.body)
+        tasks = extract_tasks(email.body)
+        urgency = detect_urgency(email.body)
+        action_type = decide_action(urgency, tasks)
+        print("DECIDED ACTION:", action_type)
+  
 
-    print("DECIDED ACTION:", action_type)
-
-    # 2️⃣ Save Email
-    email_obj = Email(
-        from_email=email.from_email,
-        subject=email.subject,
-        body=email.body,
-        summary=summary,
-        urgency=urgency
-    )
-
-    db.add(email_obj)
-    db.commit()
-    db.refresh(email_obj)
-
-    print("EMAIL STORED WITH ID:", email_obj.id)
-
-    # 3️⃣ Save Tasks
-    for task_text in tasks:
-        task_obj = Task(
-            email_id=email_obj.id,
-            task_text=task_text
+        # 2️⃣ Save Email
+        email_obj = Email(
+            from_email=email.from_email,
+            subject=email.subject,
+            body=email.body,
+            summary=summary,
+            urgency=urgency
         )
-        db.add(task_obj)
 
-    db.commit()
+        db.add(email_obj)
+        db.commit()
+        db.refresh(email_obj)
+        print("EMAIL STORED WITH ID:", email_obj.id)
 
-    # 4️⃣ Execute Action (SIMPLE)
-    execute_action(action_type, email_obj)
+        # 3️⃣ Save Action (ONLY if needed)
+        if action_type != "none":
+            action_obj = EmailAction(
+            email_id=email_obj.id,
+            action_type=action_type
+        )
+        db.add(action_obj)
+          
 
-    return email_obj
+        # 4️⃣ Save Tasks
+        for task_text in tasks:
+            task_obj = Task(
+                email_id=email_obj.id,
+                task_text=task_text
+            )
+            db.add(task_obj)
 
-
+        db.commit()
+        execute_action(action_type, email_obj)
+        return email_obj
+     
 def get_stored_emails(db: Session):
     emails = db.query(Email).all()
     for email in emails:
