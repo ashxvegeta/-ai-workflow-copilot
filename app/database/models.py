@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String,Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from datetime import datetime
 from .db import Base
 
 class Email(Base):
@@ -13,6 +14,10 @@ class Email(Base):
     summary = Column(Text)
     urgency = Column(String)
     # One email has many tasks
+    status = Column(String,default="open") # open | in_progress | resolved | escalated
+    assigned_to = Column(String, nullable=True)
+    sla_deadline = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
     tasks = relationship("Task", back_populates="email",cascade="all, delete")
 
 class Task(Base):
