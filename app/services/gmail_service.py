@@ -26,7 +26,7 @@ def fetch_unread_emails():
 
     emails = []
 
-    for eid in email_ids[:10]:  # limit 10 emails
+    for eid in email_ids[:5]:  # limit 5 emails
         status, msg_data = mail.fetch(eid, "(RFC822)")
 
         for response_part in msg_data:

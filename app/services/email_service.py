@@ -3,7 +3,7 @@
 from  sqlalchemy.orm import Session
 #ORM models: Email → parent table, Task → child table
 from app.database.models import Email, Task
-from app.routes import emails
+# from app.routes import emails
 from app.schemas.email_schema import EmailCreate
 from app.services.ai_service import (summarize_email,extract_tasks,detect_urgency)
 from app.services.action_service import decide_action
@@ -39,10 +39,10 @@ def process_and_store_emails(db: Session, email: EmailCreate):
         # 3️⃣ Save Action (ONLY if needed)
         if action_type != "none":
             action_obj = EmailAction(
-            email_id=email_obj.id,
-            action_type=action_type
-        )
-        db.add(action_obj)
+                email_id=email_obj.id,
+                action_type=action_type
+            )
+            db.add(action_obj)
           
 
         # 4️⃣ Save Tasks

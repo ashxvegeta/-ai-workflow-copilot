@@ -6,7 +6,6 @@ class EmailResponse(BaseModel):
     id: int
     from_email: str
     subject: str
-    body: str
     summary: str
     urgency: str
     action: Optional[str] = "none"
