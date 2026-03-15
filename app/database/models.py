@@ -8,6 +8,7 @@ class Email(Base):
     __tablename__ = "emails"
 
     id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(String, unique=True, index=True)
     from_email = Column(String, index=True)
     subject = Column(String)
     body = Column(Text)

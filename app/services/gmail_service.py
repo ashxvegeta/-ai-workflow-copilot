@@ -33,7 +33,7 @@ def fetch_unread_emails(limit: int = 10, unseen_only: bool = True):
         for response_part in msg_data:
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
-
+                message_id = msg.get("Message-ID")
                 subject = msg["subject"]
                 from_email = msg["from"]
 
@@ -56,7 +56,8 @@ def fetch_unread_emails(limit: int = 10, unseen_only: bool = True):
                 emails.append({
                     "from_email": from_email,
                     "subject": subject,
-                    "body": body
+                    "body": body,
+                    "message_id": message_id
                 })
 
     mail.logout()

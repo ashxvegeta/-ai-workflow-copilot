@@ -8,14 +8,16 @@ from app.services.email_service import process_and_store_emails
 # Ensure tables exist when running this script directly.
 Base.metadata.create_all(bind=engine)
 
-# Clear existing data so the run is fresh.
-con = sqlite3.connect("ai_workflow.db")
-cur = con.cursor()
-cur.execute("DELETE FROM tasks")
-cur.execute("DELETE FROM email_actions")
-cur.execute("DELETE FROM emails")
-con.commit()
-con.close()
+# Toggle this when you want a fresh DB run.
+CLEAR_DB = False
+if CLEAR_DB:
+    con = sqlite3.connect("ai_workflow.db")
+    cur = con.cursor()
+    cur.execute("DELETE FROM tasks")
+    cur.execute("DELETE FROM email_actions")
+    cur.execute("DELETE FROM emails")
+    con.commit()
+    con.close()
 
 mail = connect_gmail()
 # Scan a larger window to find 10 work-relevant emails.
@@ -29,7 +31,8 @@ for email in emails:
     email_schema = EmailCreate(
         from_email=email["from_email"],
         subject=email["subject"],
-        body=email["body"]
+        body=email["body"],
+        message_id=email.get("message_id")
     )
 
     result = process_and_store_emails(db, email_schema)

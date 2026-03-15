@@ -37,6 +37,12 @@ def process_and_store_emails(db: Session, email: EmailCreate):
     print("EMAIL TYPE:", email_type)
     print("DECIDED ACTION:", action_type)
 
+    if email.message_id:
+        existing_email = db.query(Email).filter(Email.message_id == email.message_id).first()
+        if existing_email:
+            print("DUPLICATE EMAIL - SKIPPED")
+            return None
+
     # 2️⃣ Save Email
     email_obj = Email(
         from_email=email.from_email,
@@ -44,7 +50,8 @@ def process_and_store_emails(db: Session, email: EmailCreate):
         body=email.body,
         summary=summary,
         urgency=urgency,
-        email_type=email_type
+        email_type=email_type,
+        message_id=email.message_id
     )
 
     db.add(email_obj)
