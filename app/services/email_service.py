@@ -17,17 +17,22 @@ def process_and_store_emails(db: Session, email: EmailCreate):
     # 1️⃣ AI processing
     summary = summarize_email(email.body)
 
+    sender = email.from_email.lower()
+    if "google.com" in sender or "googleplay" in sender or "no-reply" in sender:
+        print("SKIPPED SYSTEM EMAIL")
+        return None
+
     email_type = classify_email_type(email.body)
 
-    tasks = []
-    if email_type == "work":
-        tasks = extract_tasks(email.body)
+    if email_type != "work":
+        print("SKIPPED NON-WORK EMAIL")
+        return None
+
+    tasks = extract_tasks(email.body)
 
     urgency = detect_urgency(email.body)
 
-    action_type = "none"
-    if email_type == "work":
-        action_type = decide_action(urgency, tasks)
+    action_type = decide_action(urgency, tasks)
 
     print("EMAIL TYPE:", email_type)
     print("DECIDED ACTION:", action_type)
@@ -70,7 +75,13 @@ def process_and_store_emails(db: Session, email: EmailCreate):
     return email_obj
      
 def get_stored_emails(db: Session):
-    emails = db.query(Email).all()
+    emails = (
+        db.query(Email)
+        .filter(Email.email_type == "work")
+        .order_by(Email.created_at.desc())
+        .limit(10)
+        .all()
+    )
     for email in emails:
         # Fetch the latest action from the related table
         action_record = db.query(EmailAction).filter(EmailAction.email_id == email.id).first()

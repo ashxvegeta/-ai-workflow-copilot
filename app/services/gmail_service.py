@@ -15,18 +15,19 @@ def connect_gmail():
     mail.login(EMAIL_USER, EMAIL_PASS)
     return mail
 
-def fetch_unread_emails():
+def fetch_unread_emails(limit: int = 10, unseen_only: bool = True):
     mail = connect_gmail()
 
     mail.select("inbox")
 
-    status, messages = mail.search(None, "UNSEEN")
+    criteria = "UNSEEN" if unseen_only else "ALL"
+    status, messages = mail.search(None, criteria)
 
     email_ids = messages[0].split()
 
     emails = []
 
-    for eid in email_ids[:5]:  # limit 5 emails
+    for eid in email_ids[-limit:]:  # latest emails by ID
         status, msg_data = mail.fetch(eid, "(RFC822)")
 
         for response_part in msg_data:
@@ -43,10 +44,14 @@ def fetch_unread_emails():
                         content_type = part.get_content_type()
 
                         if content_type == "text/plain":
-                            body = part.get_payload(decode=True).decode()
+                            payload = part.get_payload(decode=True)
+                            if payload is not None:
+                                body = payload.decode(errors="replace")
                             break
                 else:
-                    body = msg.get_payload(decode=True).decode()
+                    payload = msg.get_payload(decode=True)
+                    if payload is not None:
+                        body = payload.decode(errors="replace")
 
                 emails.append({
                     "from_email": from_email,

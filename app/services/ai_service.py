@@ -94,6 +94,11 @@ def classify_email_type(text: str) -> str:
                 "content": (
                     "Classify this email into ONE category:\n"
                     "work, personal, newsletter, promotion, spam\n\n"
+                    "Rules:\n"
+                    "- 'work' only if it is a direct work request or task assigned.\n"
+                    "- Security alerts, account notifications, policy updates -> promotion.\n"
+                    "- Newsletters/digests -> newsletter.\n"
+                    "- Sales/marketing -> promotion.\n"
                     "Return ONLY the category word."
                 )
             },
