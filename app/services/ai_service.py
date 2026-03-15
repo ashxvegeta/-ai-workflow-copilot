@@ -83,3 +83,23 @@ def detect_urgency(text):
     )
 
     return response.choices[0].message.content.strip().lower()
+
+
+def classify_email_type(text: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Classify this email into ONE category:\n"
+                    "work, personal, newsletter, promotion, spam\n\n"
+                    "Return ONLY the category word."
+                )
+            },
+            {"role": "user", "content": text}
+        ],
+        temperature=0
+    )
+
+    return response.choices[0].message.content.strip().lower()

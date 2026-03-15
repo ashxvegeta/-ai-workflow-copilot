@@ -13,6 +13,7 @@ class Email(Base):
     body = Column(Text)
     summary = Column(Text)
     urgency = Column(String)
+    email_type = Column(String) # work | personal | spam
     # One email has many tasks
     status = Column(String,default="open") # open | in_progress | resolved | escalated
     assigned_to = Column(String, nullable=True)
