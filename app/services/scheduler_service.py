@@ -1,8 +1,12 @@
+import os
 from apscheduler.schedulers.background import BackgroundScheduler
+from dotenv import load_dotenv
 from app.services.gmail_service import fetch_unread_emails
 from app.services.email_service import process_and_store_emails
 from app.schemas.email_schema import EmailCreate
 from app.database.db import SessionLocal
+
+load_dotenv()
 
 
 def process_gmail_inbox():
@@ -25,15 +29,20 @@ def process_gmail_inbox():
     db.close()
 
 
-def start_scheduler():
+def start_scheduler(run_immediately: bool = True):
     scheduler = BackgroundScheduler()
+
+    interval_minutes = int(os.getenv("SCHEDULER_INTERVAL_MINUTES", "5"))
+
+    if run_immediately:
+        process_gmail_inbox()
 
     scheduler.add_job(
         process_gmail_inbox,
         "interval",
-        minutes=5
+        minutes=interval_minutes
     )
 
     scheduler.start()
 
-    print("Scheduler started. Checking Gmail every 5 minutes...")
+    print(f"Scheduler started. Checking Gmail every {interval_minutes} minutes...")
