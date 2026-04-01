@@ -1,3 +1,5 @@
+let allEmails = [];
+
 async function fetchEmails() {
   const list = document.getElementById("emailList");
 
@@ -17,8 +19,9 @@ async function fetchEmails() {
     const res = await fetch("/emails/");
     if (!res.ok) throw new Error("Request failed");
     const data = await res.json();
-    renderStats(data);
-    renderList(data);
+    allEmails = data;
+    renderStats(allEmails);
+    applyFilters();
   } catch (err) {
     list.innerHTML = `
       <div class="empty">
@@ -121,5 +124,30 @@ function escapeHtml(text) {
     .replace(/'/g, "&#039;");
 }
 
+function applyFilters() {
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+  const urgency = document.getElementById("urgencyFilter").value;
+  const action = document.getElementById("actionFilter").value;
+
+  const filtered = allEmails.filter((email) => {
+    const matchQuery = !query || [
+      email.subject,
+      email.from_email,
+      email.summary
+    ].join(" ").toLowerCase().includes(query);
+
+    const matchUrgency = urgency === "all" || (email.urgency || "low") === urgency;
+    const matchAction = action === "all" || (email.action || "none") === action;
+
+    return matchQuery && matchUrgency && matchAction;
+  });
+
+  renderList(filtered);
+}
+
 document.getElementById("refreshBtn").addEventListener("click", fetchEmails);
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+document.getElementById("urgencyFilter").addEventListener("change", applyFilters);
+document.getElementById("actionFilter").addEventListener("change", applyFilters);
+
 fetchEmails();
